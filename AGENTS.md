@@ -4,18 +4,14 @@ A Home Assistant **custom integration** (`custom_components/inteno_router/`)
 for an Inteno/IOPSYS home router — stats, connected-device presence, and
 reboot control via the router's `ubus` API.
 
-## Architecture constraint: this must be a real integration, not a push script
+## Architecture
 
-**Data flows from the router into Home Assistant through code that Home
-Assistant itself loads and runs** (a proper `custom_components/`
-integration, set up via HA's config flow, polled by a
-`DataUpdateCoordinator`) — never through an external script or cron job
-that pushes state into HA's REST API from outside. An external push script
-is fragile (nothing restarts it if it dies), has no HA-native config UI,
-and doesn't show up as a normal integration to manage or remove — it
-doesn't match how every other integration on a real HA instance works. If
-a task here starts looking like "write a script that calls Home Assistant's
-REST API," stop — that's the wrong shape for this repo.
+Data flows from the router into Home Assistant through a
+`custom_components/` integration that Home Assistant itself loads and
+runs: a config flow handles setup, and a `DataUpdateCoordinator` polls the
+router on an interval. This is what makes the integration restart-safe,
+configurable through HA's own UI, and manageable — install, reconfigure,
+remove — exactly like any other integration on the instance.
 
 ## Where this deploys
 
@@ -27,11 +23,10 @@ deployment access, since that's operational/personal information that
 belongs there, not in a public repo.
 
 **HACS is already installed** on the target instance
-(`/config/custom_components/hacs`).
-Once the integration is in a working state, it should be installable as a
-HACS custom repository rather than only manual SSH/`rsync` deployment — add
-a `hacs.json` and keep `custom_components/inteno_router/` as the
-HACS-recognized structure from the start rather than restructuring later.
+(`/config/custom_components/hacs`). Once the integration is in a working
+state, it should be installable as a HACS custom repository — keep
+`hacs.json` present and `custom_components/inteno_router/` in the
+HACS-recognized structure from the start.
 
 ## Cross-project knowledge — read these skills first
 
@@ -54,10 +49,10 @@ a comment here.
 ## Project milestones
 
 In order: pull stats from the router into Home Assistant; surface each
-connected device's full info (not just online/offline); trigger a reboot
-through Home Assistant. Progress against these is tracked outside this
-repo — check with whoever's driving the work for current state rather
-than assuming this file is up to date on its own.
+connected device's full info — hostname, IP, MAC, link speed, wired/
+wireless; trigger a reboot through Home Assistant. Progress against these
+is tracked outside this repo — check with whoever's driving the work for
+current state.
 
 ## Integration structure
 
