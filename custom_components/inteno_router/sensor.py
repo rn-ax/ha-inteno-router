@@ -98,8 +98,7 @@ class ClientLinkSpeedSensor(_RouterSensorBase):
     Surfaces `linkspeed` as the state so a degraded link (e.g. a client
     stuck negotiating far below what the rest of the LAN gets) is visible
     and alertable in HA directly, rather than needing a manual ubus query
-    to notice — this is what originally motivated pulling router stats
-    into HA at all (see the inteno-router skill's 2026-08-22 incident notes).
+    to notice.
     """
 
     _attr_icon = "mdi:lan-connect"

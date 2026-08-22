@@ -1,8 +1,8 @@
 # ha-inteno-router
 
 A Home Assistant **custom integration** (`custom_components/inteno_router/`)
-for the user's Inteno/IOPSYS home router — stats, connected-device
-presence, and reboot control via the router's `ubus` API.
+for an Inteno/IOPSYS home router — stats, connected-device presence, and
+reboot control via the router's `ubus` API.
 
 ## Architecture constraint: this must be a real integration, not a push script
 
@@ -10,13 +10,12 @@ presence, and reboot control via the router's `ubus` API.
 Assistant itself loads and runs** (a proper `custom_components/`
 integration, set up via HA's config flow, polled by a
 `DataUpdateCoordinator`) — never through an external script or cron job
-that pushes state into HA's REST API from outside. That approach was tried
-and explicitly rejected during scoping (2026-08-22): it's fragile (nothing
-restarts it if it dies, no HA-native config UI, doesn't show up as a normal
-integration to manage/remove), and doesn't match how every other
-integration on this HA instance already works. If a task here starts
-looking like "write a script that calls Home Assistant's REST API," stop —
-that's the wrong shape for this repo.
+that pushes state into HA's REST API from outside. An external push script
+is fragile (nothing restarts it if it dies), has no HA-native config UI,
+and doesn't show up as a normal integration to manage or remove — it
+doesn't match how every other integration on a real HA instance works. If
+a task here starts looking like "write a script that calls Home Assistant's
+REST API," stop — that's the wrong shape for this repo.
 
 ## Where this deploys
 
