@@ -1,11 +1,32 @@
-name: Deploy
+name: CI
 
-on:
-  push:
-    branches: [main]
+on: push
 
 jobs:
-  update-hacs:
+  hassfest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: home-assistant/actions/hassfest@master
+
+  hacs:
+    runs-on: ubuntu-latest
+    # pull-requests:write lets hacs/action post its results as a PR comment.
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: hacs/action@main
+        with:
+          category: integration
+          comment: true
+          # brands: tracked separately, see issue #5.
+          ignore: brands
+
+  deploy:
+    needs: [hassfest, hacs]
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
