@@ -20,12 +20,15 @@ that's the wrong shape for this repo.
 
 ## Where this deploys
 
-Home Assistant instance: Raspberry Pi 5, `root@192.168.3.71` via SSH
-(default key `~/.ssh/id_ed25519` — see the `home-assistant` skill for how
-this was discovered/confirmed). Config root is `/config`; this
-integration's code goes to `/config/custom_components/inteno_router/`.
+This integration's code goes to `/config/custom_components/inteno_router/`
+on whatever machine runs Home Assistant. This repo doesn't need to know
+(or record) that machine's address or how to reach it — see the private
+`home-assistant` Claude Code skill for the actual instance details and
+deployment access, since that's operational/personal information that
+belongs there, not in a public repo.
 
-**HACS is already installed** on this instance (`/config/custom_components/hacs`).
+**HACS is already installed** on the target instance
+(`/config/custom_components/hacs`).
 Once the integration is in a working state, it should be installable as a
 HACS custom repository rather than only manual SSH/`rsync` deployment — add
 a `hacs.json` and keep `custom_components/inteno_router/` as the
@@ -49,13 +52,13 @@ If either skill is missing information this repo needs, update the skill
 directly (it outlives this repo and any other HA/router project), not just
 a comment here.
 
-## Project tracking
+## Project milestones
 
-This repo implements atask 185 (parent: pull stats / connected devices /
-reboot, in that milestone order) and atask 186 (connected-device detail,
-child of 185). Check `atask show 185` / `atask show 186` for current state
-and update them as milestones land — don't let this file and atask drift
-out of sync about what's actually done.
+In order: pull stats from the router into Home Assistant; surface each
+connected device's full info (not just online/offline); trigger a reboot
+through Home Assistant. Progress against these is tracked outside this
+repo — check with whoever's driving the work for current state rather
+than assuming this file is up to date on its own.
 
 ## Integration structure
 

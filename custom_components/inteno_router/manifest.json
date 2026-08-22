@@ -1,7 +1,6 @@
 {
   "domain": "inteno_router",
   "name": "Inteno Router",
-  "codeowners": ["@rutinerad"],
   "config_flow": true,
   "documentation": "https://github.com/rn-ax/ha-inteno-router",
   "iot_class": "local_polling",
