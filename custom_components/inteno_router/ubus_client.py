@@ -78,3 +78,11 @@ class UbusClient:
             for obj, method in calls:
                 results[(obj, method)] = await self._call(ws, obj, method)
         return results
+
+    async def call(self, obj: str, method: str, args: dict | None = None) -> Any:
+        """Open one websocket, log in, and make a single call — for actions
+        (reboot, etc.) rather than the batched reads `fetch` is for.
+        """
+        async with websockets.connect(self._uri, subprotocols=["ubus-json"]) as ws:
+            await self.login(ws)
+            return await self._call(ws, obj, method, args)

@@ -6,6 +6,7 @@ import logging
 from datetime import timedelta
 from typing import Any
 
+import websockets
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
@@ -34,12 +35,20 @@ class IntenoRouterCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         self._client = client
 
     async def _async_update_data(self) -> dict[str, Any]:
+        # DataUpdateCoordinator only auto-reschedules the next poll for a
+        # failure it recognizes as UpdateFailed -- any other exception type
+        # is treated as an integration bug and halts polling entirely rather
+        # than retrying. A router reboot (or any transient network blip)
+        # surfaces as a raw ConnectionRefusedError/OSError or a websockets
+        # protocol exception, neither of which is UpdateFailed on its own,
+        # so both need converting here or a single reboot permanently kills
+        # every entity until the integration is manually reloaded.
         try:
             results = await self._client.fetch([
                 ("router.network", "clients"),
                 ("router.system", "info"),
             ])
-        except UbusAuthError as err:
+        except (UbusAuthError, OSError, TimeoutError, websockets.exceptions.WebSocketException) as err:
             raise UpdateFailed(f"Failed talking to router: {err}") from err
 
         # Re-key clients by MAC address rather than the API's own "client-N"

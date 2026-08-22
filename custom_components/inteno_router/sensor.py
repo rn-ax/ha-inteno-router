@@ -15,7 +15,7 @@ from .coordinator import IntenoRouterCoordinator
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
-    coordinator: IntenoRouterCoordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator: IntenoRouterCoordinator = hass.data[DOMAIN][entry.entry_id].coordinator
 
     entities: list[SensorEntity] = [
         RouterCpuSensor(coordinator, entry.entry_id),
