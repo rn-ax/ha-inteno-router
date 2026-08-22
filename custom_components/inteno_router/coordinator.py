@@ -47,6 +47,7 @@ class IntenoRouterCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             results = await self._client.fetch([
                 ("router.network", "clients"),
                 ("router.system", "info"),
+                ("juci.network", "load"),
             ])
         except (UbusAuthError, OSError, TimeoutError, websockets.exceptions.WebSocketException) as err:
             raise UpdateFailed(f"Failed talking to router: {err}") from err
@@ -63,4 +64,5 @@ class IntenoRouterCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         return {
             "clients": clients_by_mac,
             "system": results[("router.system", "info")],
+            "load": results[("juci.network", "load")],
         }
