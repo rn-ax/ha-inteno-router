@@ -1,0 +1,21 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to your Inteno router",
+        "data": {
+          "host": "Router IP address",
+          "username": "Admin username",
+          "password": "Admin password"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Invalid username or password",
+      "cannot_connect": "Could not connect to the router"
+    },
+    "abort": {
+      "already_configured": "This router is already configured"
+    }
+  }
+}
