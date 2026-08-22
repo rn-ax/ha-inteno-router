@@ -3,13 +3,4 @@ _extends: poppycock
 repository:
   name: ha-inteno-router
   description: Home Assistant custom integration for the Inteno/IOPSYS home router (stats, connected devices, reboot)
-
-branches:
-  - name: main
-    protection:
-      required_pull_request_reviews:
-        required_approving_review_count: 0
-      required_status_checks: null
-      enforce_admins: false
-      required_linear_history: false
-      restrictions: null
+  has_issues: true
