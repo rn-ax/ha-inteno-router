@@ -1,10 +1,5 @@
 name: Validate
 
-# GitHub-hosted runners, not the org's usual self-hosted ones: the org's
-# self-hosted runner group has allows_public_repositories: false (a
-# deliberate security boundary, kept as-is rather than opened up org-wide
-# for one workflow), and hassfest/hacs/action don't need anything the
-# self-hosted runners specifically provide.
 on: push
 
 jobs:
