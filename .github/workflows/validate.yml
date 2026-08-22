@@ -1,0 +1,22 @@
+name: Validate
+
+on:
+  push:
+    branches: ['**']
+  workflow_dispatch:
+
+jobs:
+  hassfest:
+    runs-on: [self-hosted, contabo]
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: home-assistant/actions/hassfest@master
+
+  hacs:
+    runs-on: [self-hosted, contabo]
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: hacs/action@main
+        with:
+          category: integration
+          comment: false
