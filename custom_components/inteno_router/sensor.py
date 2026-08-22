@@ -41,8 +41,12 @@ async def async_setup_entry(
             return
         known_macs.update(new_macs)
         async_add_entities(
-            ClientLinkSpeedSensor(coordinator, entry.entry_id, macaddr)
+            entity
             for macaddr in new_macs
+            for entity in (
+                ClientLinkSpeedSensor(coordinator, entry.entry_id, macaddr),
+                ClientIpAddressSensor(coordinator, entry.entry_id, macaddr),
+            )
         )
 
     _add_new_clients()
@@ -138,38 +142,45 @@ class RouterMaxConnectionsSensor(_RouterSensorBase):
         return self.coordinator.data["load"]["max_connections"]
 
 
-class ClientLinkSpeedSensor(_RouterSensorBase):
-    """One entity per connected client, keyed by MAC (stable across hostname changes
-    and across the API's own "client-N" numbering, which isn't confirmed stable).
-
-    Surfaces `linkspeed` as the state so a degraded link (e.g. a client
-    stuck negotiating far below what the rest of the LAN gets) is visible
-    and alertable in HA directly, rather than needing a manual ubus query
-    to notice.
+class _ClientSensorBase(_RouterSensorBase):
+    """Shared client lookup for entities keyed by MAC address (stable across
+    hostname changes and across the API's own "client-N" numbering, which
+    isn't confirmed stable).
     """
-
-    _attr_icon = "mdi:lan-connect"
 
     def __init__(self, coordinator: IntenoRouterCoordinator, entry_id: str, macaddr: str) -> None:
         super().__init__(coordinator, entry_id)
         self._macaddr = macaddr
-        self._attr_unique_id = f"{entry_id}_client_{macaddr}"
 
     @property
     def _client(self) -> dict | None:
         return self.coordinator.data["clients"].get(self._macaddr)
 
     @property
+    def available(self) -> bool:
+        # A client can drop off between polls (device off, DHCP lease
+        # expired) -- report unavailable rather than a stale value.
+        return super().available and self._client is not None
+
+
+class ClientLinkSpeedSensor(_ClientSensorBase):
+    """One entity per connected client, surfacing `linkspeed` as the state
+    so a degraded link (e.g. a client stuck negotiating far below what the
+    rest of the LAN gets) is visible and alertable in HA directly, rather
+    than needing a manual ubus query to notice.
+    """
+
+    _attr_icon = "mdi:lan-connect"
+
+    def __init__(self, coordinator: IntenoRouterCoordinator, entry_id: str, macaddr: str) -> None:
+        super().__init__(coordinator, entry_id, macaddr)
+        self._attr_unique_id = f"{entry_id}_client_{macaddr}"
+
+    @property
     def name(self):
         client = self._client
         hostname = client["hostname"] if client else self._macaddr
         return f"{hostname} link speed"
-
-    @property
-    def available(self) -> bool:
-        # A client can drop off between polls (device off, DHCP lease
-        # expired) -- report unavailable rather than a stale linkspeed.
-        return super().available and self._client is not None
 
     @property
     def native_value(self):
@@ -189,3 +200,27 @@ class ClientLinkSpeedSensor(_RouterSensorBase):
             "ethport": client.get("ethport"),
             "active_connections": client["active_connections"],
         }
+
+
+class ClientIpAddressSensor(_ClientSensorBase):
+    """One entity per connected client exposing its current IP address as
+    its own state, rather than only as an attribute tucked away on the
+    link-speed sensor.
+    """
+
+    _attr_icon = "mdi:ip-network"
+
+    def __init__(self, coordinator: IntenoRouterCoordinator, entry_id: str, macaddr: str) -> None:
+        super().__init__(coordinator, entry_id, macaddr)
+        self._attr_unique_id = f"{entry_id}_client_{macaddr}_ip"
+
+    @property
+    def name(self):
+        client = self._client
+        hostname = client["hostname"] if client else self._macaddr
+        return f"{hostname} IP address"
+
+    @property
+    def native_value(self):
+        client = self._client
+        return client["ipaddr"] if client else None
