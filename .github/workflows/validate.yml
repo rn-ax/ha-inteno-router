@@ -1,16 +1,21 @@
 name: Validate
 
+# GitHub-hosted runners, not the org's usual self-hosted ones: the org's
+# self-hosted runner group has allows_public_repositories: false (a
+# deliberate security boundary, kept as-is rather than opened up org-wide
+# for one workflow), and hassfest/hacs/action don't need anything the
+# self-hosted runners specifically provide.
 on: push
 
 jobs:
   hassfest:
-    runs-on: [self-hosted, contabo]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: home-assistant/actions/hassfest@master
 
   hacs:
-    runs-on: [self-hosted, contabo]
+    runs-on: ubuntu-latest
     # pull-requests:write lets hacs/action post its results as a PR comment.
     permissions:
       contents: read
