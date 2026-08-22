@@ -21,6 +21,8 @@ async def async_setup_entry(
         RouterCpuSensor(coordinator, entry.entry_id),
         RouterMemorySensor(coordinator, entry.entry_id),
         RouterUptimeSensor(coordinator, entry.entry_id),
+        RouterActiveConnectionsSensor(coordinator, entry.entry_id),
+        RouterMaxConnectionsSensor(coordinator, entry.entry_id),
     ])
 
     # Client sensors are created as clients are discovered, not just once
@@ -108,6 +110,32 @@ class RouterUptimeSensor(_RouterSensorBase):
     @property
     def native_value(self):
         return self.coordinator.data["system"]["system"]["uptime"]
+
+
+class RouterActiveConnectionsSensor(_RouterSensorBase):
+    _attr_name = "Router active connections"
+    _attr_icon = "mdi:swap-horizontal"
+
+    def __init__(self, coordinator, entry_id):
+        super().__init__(coordinator, entry_id)
+        self._attr_unique_id = f"{entry_id}_active_connections"
+
+    @property
+    def native_value(self):
+        return self.coordinator.data["load"]["active_connections"]
+
+
+class RouterMaxConnectionsSensor(_RouterSensorBase):
+    _attr_name = "Router max connections"
+    _attr_icon = "mdi:swap-horizontal-bold"
+
+    def __init__(self, coordinator, entry_id):
+        super().__init__(coordinator, entry_id)
+        self._attr_unique_id = f"{entry_id}_max_connections"
+
+    @property
+    def native_value(self):
+        return self.coordinator.data["load"]["max_connections"]
 
 
 class ClientLinkSpeedSensor(_RouterSensorBase):
