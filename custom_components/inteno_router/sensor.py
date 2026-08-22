@@ -17,15 +17,34 @@ async def async_setup_entry(
 ) -> None:
     coordinator: IntenoRouterCoordinator = hass.data[DOMAIN][entry.entry_id].coordinator
 
-    entities: list[SensorEntity] = [
+    async_add_entities([
         RouterCpuSensor(coordinator, entry.entry_id),
         RouterMemorySensor(coordinator, entry.entry_id),
         RouterUptimeSensor(coordinator, entry.entry_id),
-    ]
-    for macaddr in coordinator.data["clients"]:
-        entities.append(ClientLinkSpeedSensor(coordinator, entry.entry_id, macaddr))
+    ])
 
-    async_add_entities(entities)
+    # Client sensors are created as clients are discovered, not just once
+    # at setup: a client absent at startup (router mid-reboot, cable
+    # unplugged, etc.) still needs its own entity the moment it shows up
+    # in a later poll, rather than never getting one for the rest of this
+    # run. known_macs tracks what's already been created so this only ever
+    # adds new entities, never duplicates one for a MAC that's already got
+    # one -- a client dropping off and coming back just flips its existing
+    # entity's `available` property, handled separately below.
+    known_macs: set[str] = set()
+
+    def _add_new_clients() -> None:
+        new_macs = set(coordinator.data["clients"]) - known_macs
+        if not new_macs:
+            return
+        known_macs.update(new_macs)
+        async_add_entities(
+            ClientLinkSpeedSensor(coordinator, entry.entry_id, macaddr)
+            for macaddr in new_macs
+        )
+
+    _add_new_clients()
+    entry.async_on_unload(coordinator.async_add_listener(_add_new_clients))
 
 
 class _RouterSensorBase(CoordinatorEntity[IntenoRouterCoordinator], SensorEntity):
