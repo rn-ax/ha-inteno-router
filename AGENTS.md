@@ -46,13 +46,10 @@ If either skill is missing information this repo needs, update the skill
 directly (it outlives this repo and any other HA/router project), not just
 a comment here.
 
-## Project milestones
+## Project scope
 
-In order: pull stats from the router into Home Assistant; surface each
-connected device's full info — hostname, IP, MAC, link speed, wired/
-wireless; trigger a reboot through Home Assistant. Progress against these
-is tracked outside this repo — check with whoever's driving the work for
-current state.
+Tracked as [GitHub Issues](https://github.com/rn-ax/ha-inteno-router/issues) on this repo, not here — check there for current
+status and remaining work rather than this file.
 
 ## Integration structure
 
