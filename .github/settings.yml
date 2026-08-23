@@ -4,3 +4,4 @@ repository:
   name: ha-inteno-router
   description: Home Assistant custom integration for the Inteno/IOPSYS home router
   has_issues: true
+  private: false
