@@ -21,8 +21,6 @@ jobs:
         with:
           category: integration
           comment: true
-          # brands: tracked separately, see issue #5.
-          ignore: brands
 
   deploy:
     needs: [hassfest, hacs]
